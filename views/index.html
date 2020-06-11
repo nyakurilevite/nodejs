@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>CRUD OPERATION WITH NODEJS/Express</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+  <script src="/js/getrequest.js"></script>
+  <script src="/js/postrequest.js"></script>
+  <script src="/js/searchrequest.js"></script>
+   <script src="/js/updaterequest.js"></script>
+   <script>
+$(document).ready(function(){
+   
+        $.get("api/user/session",function(data){
+            $('#welcome_message').append(data+ '<a href="/api/user/logout" class="btn btn-link">Log out</a>');
+        });
+   
+});
+</script>
+</head>
+ 
+<body> 
+<div class="container"> 
+<h3 id='welcome_message'>Welcome : </h3>
+  <h3>CRUD OPERATION WITH NODEJS/Express</h3>
+ <div class='row'>
+  <div class='col-md-4'>
+    <form id="customerForm" action='#' method='POST'>
+      <div class="form-group" >
+      <label for="firstname">FirstName:</label>
+      <input type="text" class="form-control" id="firstname" placeholder="Enter FirstName"/>
+      </div>
+      <div class="form-group">
+      <label for="lastname">LastName:</label>
+      <input type="text" class="form-control" id="lastname" placeholder="Enter LastName"/>
+      </div>
+	  <div class="form-group">
+      <label for="age">Age:</label>
+      <input type="number" class="form-control" id="age" placeholder="Enter Age"/>
+      </div>
+	  <div class="form-group">
+      <label for="sex">Sex:</label>
+      <select class='form-control' id='sex' name='sex' >
+	  <option>M</option>
+	  <option>F</option>
+	  </select>
+      </div>
+	  <div class="form-group">
+      <label for="lastname">Income:</label>
+      <input type="number" class="form-control" id="income" placeholder="Enter income"/>
+	  <input type="hidden" class="form-control" id="account_id" value="">
+      </div>
+      <button type="button" id="submit_btn" class="btn btn-default">Submit</button>
+	   	  <button type="button" id="update_btn" class="btn btn-default">UPDATE</button>
+		   <button type="reset" id="reset_btn" class="btn btn-default">Reset</button>
+
+    </form>
+    <br><br>
+    <h4>Send email using nodeJS</h4>
+    <div id='feedback2'></div>
+   <form id="sendemailfrm" action='#' method='POST'>
+      <div class="form-group">
+      <label for="lastname">Email To:</label>
+      <input type="email" class="form-control" id="emailto" placeholder=""/>
+      </div>
+      <div class="form-group">
+      <label for="lastname">Subject:</label>
+      <input type="email" class="form-control" id="emailsubject" placeholder=""/>
+      </div>
+      <div class="form-group">
+      <label for="lastname">Contents:</label>
+      <textarea class="form-control" id="emailcontents"></textarea>
+      </div>
+    
+      <button type="button" id="send_email_btn" class="btn btn-default">Send email</button>
+       <button type="reset" id="reset_btn" class="btn btn-default">Reset</button>
+
+    </form>
+    <br> <br>
+     <form id="uploadForm"
+         enctype="multipart/form-data"
+         action="/api/photo"
+         method="post">
+      <input type="file" name="userPhoto" />
+      <input type="submit" value="Upload Image" name="submit">
+      <span id = "status"></span>
+    </form>
+
+
+  <div id="postResultDiv">
+  </div>
+  <br>
+   </div>
+   <div class='col-md-8'>
+   <div class='container'>
+   <div class='row'>
+	<div class='col-md-3'>
+	<div class="form-group">
+      <input type="text" class="form-control" id="search_user" placeholder="Search user by first name"/>
+      </div>
+	  </div>
+	  
+	  </div>
+	  </div>
+	<br><br><br>
+	<div id='feedback'></div>
+    <div id="getResultDiv" style='overflow:auto;height: 350px'>
+          <div class='table-responsive'>
+		  <table class='table table-bordered table-striped table-hover'>
+		  <thead>
+		  <tr><td>ID</td><td>FIRST NAME</td><td>LAST NAME</td><td>AGE</td><td>SEX</td><td>INCOME/Mo</td><td>TOTAL/YR</td><td>DELETE</td><td>LOAD/UPDATE</td></tr>
+		  </thead>
+		  <tbody id='results'></tbody>
+		  </table>
+		  </div>
+      </div>
+  </div>
+</div>
+</div>
+
+<script>
+$(document).ready(function(){
+  
+    $("#send_email_btn").click(function(){
+        
+   
+
+     var formData = {
+        emailto:$("#emailto").val(),
+        emailsubject:$("#emailsubject").val(),
+        emailcontents:$("#emailcontents").val()
+      }
+    $.ajax({
+      type : "POST",
+      contentType : "application/json",
+      url : "/api/send/email",
+      data : JSON.stringify(formData),
+      dataType : 'json',
+      success: function(result){
+        if(result=='Sent')
+        {
+       $('#feedback2').html('<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><strong><i class="fa fa-exclamation-triangle"></i></strong> This email successfully sent!</div>');
+     }
+      }
+    })
+    });
+});
+
+
+
+
+           
+      var busy = false;
+     var limit = 7;
+      var offset = 0;
+    // PREPARE FORM DATA
+     
+      function displayRecords(lim, off) {
+
+    $.ajax({
+      type : "POST",
+      url : "api/customers/get?limit="+ limit +"&offset="+ offset,
+      data : "",
+      success: function(result){
+
+    var id=offset;
+        $.each(result, function(i, customer){
+          id=id+1;
+           //$('#getResultDiv').scrollTop($('#getResultDiv')[0].scrollHeight);
+
+          $('#results').append("<tr><td>"+ id + "</td><td> " + customer.FIRST_NAME + "</td><td> " + customer.LAST_NAME + "</td><td> " + customer.AGE + "</td><td> " + customer.SEX + "</td><td> " + customer.INCOME + "</td><td> " + customer.INCOME*12 + "</td><td> <a id='delete"+ id + "' href='javascript:void();' class='btn btn-link'>Delete</a></td><td> <a id='load"+ id + "' href='javascript:void();' class='btn btn-link'>Load & Update</a></td></tr>");
+      $('#delete'+id).click(function(){
+        if(confirm("Are you sure?"))
+        {
+        $.ajax({
+                type : "DELETE",
+                url : "api/customers/delete/" + customer.id,
+                success: function(result){
+             $('#results').html(result);
+               }
+        })
+        }
+        });
+        
+        $('#load'+id).click(function(){
+        $.ajax({
+                type : "GET",
+                url : "api/customers/get/" + customer.id,
+                success: function(result){
+          $.each(result, function(i, employee){
+                $('#firstname').val(employee.FIRST_NAME);
+            $('#lastname').val(employee.LAST_NAME);
+            $('#age').val(employee.AGE);
+            $('#income').val(employee.INCOME);
+            $('#account_id').val(employee.id);
+          });
+               }
+        })
+        });
+        
+      })
+
+      },
+      error : function(e) {
+        $("#getResultDiv").html("<strong>Error</strong>");
+        console.log("ERROR: ", e);
+      }
+    })
+      }
+
+      $(document).ready(function() {
+        // start to load the first set of data
+        if (busy == false) {
+          busy = true;
+          // start to load the first set of data
+          displayRecords(limit, offset);
+
+
+        }
+
+
+
+})    //Or window
+     $('#getResultDiv').scroll(function(){
+              //Or window
+  toScroll = $(this).height() - $(this).height() - 0;
+  if ( $(this).scrollTop() > toScroll ) {
+           busy = true;
+            offset = limit + offset;
+            // this is optional just to delay the loading of data
+           // setTimeout(function() { displayRecords(limit, offset); }, 1000);
+
+            // you can remove the above code and can use directly this function
+           displayRecords(limit, offset);
+
+  }
+}); 
+
+</script>
+<script>
+  $(document).ready(function() {
+
+     $('#uploadForm').submit(function() {
+        $("#status").empty().text("File is uploading...");
+        $(this).ajaxSubmit({
+
+            error: function(xhr) {
+        status('Error: ' + xhr.status);
+            },
+
+            success: function(response) {
+        $("#status").empty().text(response);
+                console.log(response);
+            }
+    });
+        //Very important line, it disable the page refresh.
+    return false;
+    });    
+});
+</script>
+</body>
+</html>
