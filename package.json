@@ -4,10 +4,10 @@
   "description": "This is my essay app",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start" : "node app.js"
   },
   "engine": {
-    "node": "v12.16.2"
+    "node": "^10"
   },
   "author": "Nyakuri Levite",
   "license": "ISC",
