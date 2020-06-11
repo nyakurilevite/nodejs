@@ -1,0 +1,9 @@
+{
+	"name":"levite-nodejs",
+	"description":"This is essay app with node.js",
+	"repository":"https://github.com/nyakurilevite/nodejs.git",
+	"logo":"This is essay app with node.js",
+	"keywords":["essay app","Node js","Levite"],
+	"image":"heroku/nodejs"
+
+}
