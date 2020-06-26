@@ -24,10 +24,10 @@ var path = __dirname + '/views/';
 //############################CREATE CONNECTION TO THE MYSQL DATABASE#########################
 
 var mysqlConnection = mysql.createConnection({
-    host: 'bjq3f4jq8c2mg8w01ylo-mysql.services.clever-cloud.com',
-    user: 'uwxrerrssa5wwwzj',
-    password: 'YafmlgjTqPhWQoDcB15f',
-    database: 'bjq3f4jq8c2mg8w01ylo',
+    host: '',
+    user: '',
+    password: '',
+    database: '',
     multipleStatements: "true", 
 });
 //##########################//CREATE CONNECTION TO THE MYSQL DATABASE#########################
